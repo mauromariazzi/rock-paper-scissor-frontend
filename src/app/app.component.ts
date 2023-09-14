@@ -1,10 +1,79 @@
 import { Component } from '@angular/core';
+import { GameService } from 'src/service/game.service';
+import { Game } from './model/Game.model';
+import { Round } from './model/Round.model';
+import { FormBuilder, FormControl } from '@angular/forms';
 
+
+enum GameStatus {
+  STARTED = 'STARTED',
+  FINISHED = 'FINISHED',
+}
+
+enum Choice {
+  ROCK = 'ROCK',
+  PAPER = 'PAPER',
+  SCISSOR = 'SCISSOR',
+}
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'rock-paper-scissor-frontend';
+  
+  playerName = new FormControl('')
+
+  currentGame: Game = {
+    id: 0,
+    playerName: '',
+    playerScore: 0,
+    status: '',
+    rounds: []
+  }
+
+  currentRound: Round = {
+    playerChoice: '',
+    computerChoice: '',
+    playerResult: '',
+  }
+
+  gameStatus: typeof GameStatus = GameStatus;
+  possibleChoices: typeof Choice = Choice;
+
+  showResult: boolean = false;
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private gameService: GameService
+  ) {}
+
+  startGame() {
+    console.log("playerName value ", this.playerName.value)
+    if(this.playerName.value) {
+      this.gameService.startGame(this.playerName.value).subscribe(game => {
+        this.currentGame = game;
+        console.log("this.currentGame ", this.currentGame)
+      })
+    }
+  }
+
+  endGame() {
+    this.gameService.endGame(this.currentGame.id).subscribe(game => {
+      this.currentGame = game;
+      setTimeout(() => {
+        location.reload();
+      }, 2000)
+    });
+  }
+
+  playRound(choice: string) {
+    console.log("this.currentGame ", this.currentGame)
+    this.gameService.playRound(this.currentGame.id, choice).subscribe(game => {
+      this.currentGame = game;
+      this.currentRound = game.rounds[game.rounds.length -1];
+      console.log("this.currentRound ", this.currentRound)
+      this.showResult = true;
+    })
+  }
 }
