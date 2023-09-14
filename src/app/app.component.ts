@@ -49,11 +49,9 @@ export class AppComponent {
   ) {}
 
   startGame() {
-    console.log("playerName value ", this.playerName.value)
     if(this.playerName.value) {
       this.gameService.startGame(this.playerName.value).subscribe(game => {
         this.currentGame = game;
-        console.log("this.currentGame ", this.currentGame)
       })
     }
   }
@@ -68,11 +66,9 @@ export class AppComponent {
   }
 
   playRound(choice: string) {
-    console.log("this.currentGame ", this.currentGame)
     this.gameService.playRound(this.currentGame.id, choice).subscribe(game => {
       this.currentGame = game;
       this.currentRound = game.rounds[game.rounds.length -1];
-      console.log("this.currentRound ", this.currentRound)
       this.showResult = true;
     })
   }
